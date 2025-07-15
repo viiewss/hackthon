@@ -1,0 +1,133 @@
+enum TransactionType {
+    TRANSFER
+    DEPOSIT
+    WITHDRAWAL
+    PAYMENT
+    REFUND
+}
+
+enum TransactionStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    CANCELLED
+    PROCESSING
+}
+
+type Transaction {
+    id: ID!
+    transactionReference: String!
+    fromAccountId: ID
+    toAccountId: ID
+    userId: ID!
+    transactionType: TransactionType!
+    transactionStatus: TransactionStatus!
+    amount: Float!
+    currency: String!
+    description: String
+    failureReason: String
+    createdAt: String!
+    updatedAt: String!
+    processedAt: String
+}
+
+input CreateTransactionInput {
+    userId: ID!
+    type: TransactionType!
+    amount: Float!
+    currency: String
+    description: String
+}
+
+input CreateTransferInput {
+    userId: ID!
+    fromAccountId: ID!
+    toAccountId: ID!
+    amount: Float!
+    currency: String
+    description: String
+}
+
+input UpdateTransactionStatusInput {
+    transactionId: ID!
+    status: TransactionStatus!
+    failureReason: String
+}
+
+type UserTransactionSummary {
+    userId: ID!
+    completedCount: Int!
+    pendingCount: Int!
+    failedCount: Int!
+    totalDeposits: Float!
+    totalWithdrawals: Float!
+    totalTransfers: Float!
+    transactions: [Transaction!]!
+}
+
+type Query {
+    # Get all transactions
+    transactions: [Transaction!]!
+    
+    # Get transaction by ID
+    transaction(id: ID!): Transaction
+    
+    # Get transaction by reference
+    transactionByReference(reference: String!): Transaction
+    
+    # Get transactions by user ID
+    transactionsByUserId(userId: ID!): [Transaction!]!
+    
+    # Get transactions by user ID and status
+    transactionsByUserIdAndStatus(userId: ID!, status: TransactionStatus!): [Transaction!]!
+    
+    # Get transactions by user ID and type
+    transactionsByUserIdAndType(userId: ID!, type: TransactionType!): [Transaction!]!
+    
+    # Get transactions by account ID
+    transactionsByAccountId(accountId: ID!): [Transaction!]!
+    
+    # Get transactions by status
+    transactionsByStatus(status: TransactionStatus!): [Transaction!]!
+    
+    # Get transactions by type
+    transactionsByType(type: TransactionType!): [Transaction!]!
+    
+    # Get transactions by date range
+    transactionsByDateRange(userId: ID!, startDate: String!, endDate: String!): [Transaction!]!
+    
+    # Get transactions by account and date range
+    transactionsByAccountAndDateRange(accountId: ID!, startDate: String!, endDate: String!): [Transaction!]!
+    
+    # Get user transaction summary
+    userTransactionSummary(userId: ID!): UserTransactionSummary!
+    
+    # Get stale transactions
+    staleTransactions(hoursOld: Int!): [Transaction!]!
+}
+
+type Mutation {
+    # Create a new transaction
+    createTransaction(input: CreateTransactionInput!): Transaction!
+    
+    # Create a transfer transaction
+    createTransfer(input: CreateTransferInput!): Transaction!
+    
+    # Update transaction status
+    updateTransactionStatus(input: UpdateTransactionStatusInput!): Transaction!
+    
+    # Complete transaction
+    completeTransaction(transactionId: ID!): Transaction!
+    
+    # Fail transaction
+    failTransaction(transactionId: ID!, failureReason: String!): Transaction!
+    
+    # Cancel transaction
+    cancelTransaction(transactionId: ID!): Transaction!
+    
+    # Delete transaction
+    deleteTransaction(transactionId: ID!): Boolean!
+    
+    # Process pending transactions
+    processPendingTransactions: Boolean!
+} 
